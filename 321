@@ -1,0 +1,46 @@
+const express = require("express");
+const sqlite3 = require("sqlite3");
+const {open} = require("sqlite");
+
+const app = express();
+const PORT = 3000;
+
+const dbPromise = open({
+  filename: "memory;",
+  driver: sqlite3.Database,
+});
+
+async function setupDatabase() {
+    const db = await dbPromise;
+    await db.exec(`
+        CREATE TABLE Usuarios (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            nome TEXT,
+            email TEXT)`);
+    
+    await db.exec(`
+        INSERT INTO Usuarios (nome, email) VALUES
+            ('Alice', 'alice@gmail.com'),
+            ('Bob', 'bob@gmail.com'),
+            ('Charlie', 'Charlie@gmail.com')`);
+            console.log("Banco de dados foi inicializado com sucesso.");
+        }
+        app.get("/usuarios", async (req, res) => {
+            const db = await dbPromise;
+            const nome = req.query.nome;
+
+            // vunerabilidade de SQL Injection
+            const query = `SELECT * FROM Usuarios WHERE nome = '${nome}'`;
+            console.log("Executando a query:", query);
+
+            try {
+                const  usuarios = await db.all{
+                    
+                }
+            }
+        });
+
+        app.listen(PORT, async () => {
+            await setupDatabase();
+            console.log(`Servidor rodando na porta ${PORT}`);
+        });
